@@ -52,19 +52,15 @@ for ts in pto.trajectory:
     oh1_dist.append(oh1)
     oh2_dist.append(oh2)
     
-    # rgyr = pto.atoms.center_of_mass()
-    # print(f"Frame: {ts.frame:3d}, Time: {time:4.0f} ps, Rgyr: {rgyr} A")
-
 #Dihedral analysis
 dih = dihedrals.Dihedral([pto.atoms[[0,1,2,3]]]).run()
 dihedral_angles = dih.results.angles
-
 
 # array of trajectory positions
 trajectory_positions = np.asarray(trajectory_positions)
 
 # plot angle values over time
-plt.title("Middle proton angle")
+plt.title("Middle proton angle O-H-O")
 plt.xlabel("Trajectory time [fs]")
 plt.ylabel("Angle [degrees]")
 plt.plot(angles[300:600])
@@ -99,23 +95,25 @@ plt.show()
 
 #%% Plot histogram after binning
 
-BIN_THR = 0.01
+BIN_THR = 0.15
 oh1_dist = np.array(oh1_dist)
 oh1_r0 = oh1_dist.mean()
 oh1_dist_bin = oh1_dist[oh1_dist < oh1_r0 + BIN_THR]
 oh1_dist_bin = oh1_dist_bin[oh1_dist_bin > oh1_r0 - BIN_THR]
+
 oh2_dist = np.array(oh2_dist)
 oh2_r0 = oh2_dist.mean()
 oh2_dist_bin = oh2_dist[oh2_dist < oh2_r0 + BIN_THR]
 oh2_dist_bin = oh2_dist_bin[oh2_dist_bin > oh2_r0 - BIN_THR]
 
-plt.title("Histogram of distance from middle H [binned between -0.1 and 0.1")
+plt.title(f"Histogram of distance from middle H [binned between -{BIN_THR} and {BIN_THR}]")
 plt.xlabel("distance [A]")
 plt.ylabel("Density")
-sns.kdeplot(data=oh1_dist_bin, label="O1-H")
-sns.kdeplot(data=oh2_dist, label="O2-H")
+sns.histplot(data=oh1_dist_bin, label="O1-H", kde=True, fill=False, alpha=0.2)
+sns.histplot(data=oh2_dist_bin, label="O2-H", kde=True, fill=False, alpha=0.2)
+#sns.kdeplot(data=oh1_dist_bin, label="O1-H")
+#sns.kdeplot(data=oh2_dist_bin, label="O2-H")
 plt.axvline(np.array(oh1_dist_bin).mean(), color='b', linestyle='dashed', label="O1-H r0")
 plt.axvline(np.array(oh2_dist_bin).mean(), color='r', linestyle='dashed', label="O2-H r0")
 plt.legend()
 plt.show()
-
