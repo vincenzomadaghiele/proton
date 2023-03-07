@@ -30,7 +30,7 @@ def calculateDistances(MDAuniverse):
             for ts in MDAuniverse.trajectory:
                 dist = rms.rmsd(MDAuniverse.atoms[[atom1]].positions, MDAuniverse.atoms[[atom2]].positions)
                 distances.append(dist)
-            # introduce check with bins
+            # binning before saving params
             r0 = np.array(distances).mean()
             k = np.array(distances).std()
             r0_line.append(r0)
@@ -59,6 +59,7 @@ def calculateAngles(MDAuniverse):
                 for ts in MDAuniverse.trajectory:                
                     angle = MDAuniverse.atoms[[atom1,atom2,atom3]].angle.value() # group three atoms
                     angles.append(angle) # get angle value
+                # binning before saving params
                 theta0 = np.array(angles).mean()
                 k = np.array(angles).std()
                 theta0_line.append(theta0)
