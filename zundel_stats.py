@@ -108,15 +108,18 @@ h2o = atoms[[0,2,6]]
 h2o_angle = h2o.angle
 
 
-#%% middle proton angle
+# MIDDLE PROTON
+
 angles = []
 for ts in pto.trajectory:
     # calculate angle
     h2o_angle = atoms[[0,3,1]].angle.value() # group three atoms
     angles.append(h2o_angle) # get angle value
 
+print("Proton angle O1-H3-O0")
 print(f"Mean: {np.array(angles).mean()}")
 print(f"Std: {np.array(angles).std()}")
+print()
 
 # angle values over time
 plt.title("Middle proton angle O1-H3-O0")
@@ -135,15 +138,19 @@ plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
 
-#%% H4-O1-H5 proton angle
+# WATER MOLECULES
+
+# H4-O1-H5 proton angle
 angles = []
 for ts in pto.trajectory:
     # calculate angle
     h2o_angle = atoms[[4,1,5]].angle.value() # group three atoms
     angles.append(h2o_angle) # get angle value
 
+print("Proton angle H4-O1-H5")
 print(f"Mean: {np.array(angles).mean()}")
 print(f"Std: {np.array(angles).std()}")
+print()
 
 # histogram of angles
 plt.title("Histogram of water molecule angle H4-O1-H5")
@@ -153,16 +160,17 @@ sns.histplot(data=angles, kde=True, fill=False, alpha=0.5)
 plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
-
-#%% H2-O0-H6 proton angle
+# H2-O0-H6 proton angle
 angles = []
 for ts in pto.trajectory:
     # calculate angle
     h2o_angle = atoms[[2,0,6]].angle.value() # group three atoms
     angles.append(h2o_angle) # get angle value
     
+print("Proton angle H2-O0-H6")
 print(f"Mean: {np.array(angles).mean()}")
 print(f"Std: {np.array(angles).std()}")
+print()
 
 # histogram of angles
 plt.title("Histogram of water molecule angle H2-O0-H6")
@@ -173,15 +181,19 @@ plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
 
-#%% H3-O1-H4 proton angle
+# HYDROGEN OXIGEN MIDDLE PROTON
+
+#% H3-O1-H4 proton angle
 angles = []
 for ts in pto.trajectory:
     # calculate angle
     h2o_angle = atoms[[3,1,4]].angle.value() # group three atoms
     angles.append(h2o_angle) # get angle value
 
+print("Proton angle H3-O1-H4")
 print(f"Mean: {np.array(angles).mean()}")
 print(f"Std: {np.array(angles).std()}")
+print()
 
 # histogram of angles
 plt.title("Histogram of water molecule angle H3-O1-H4")
@@ -191,16 +203,17 @@ sns.histplot(data=angles, kde=True, fill=False, alpha=0.5)
 plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
-
-#%% H3-O0-H2 proton angle
+# H3-O0-H2 proton angle
 angles = []
 for ts in pto.trajectory:
     # calculate angle
     h2o_angle = atoms[[3,0,2]].angle.value() # group three atoms
     angles.append(h2o_angle) # get angle value
 
+print("Proton angle H3-O0-H2")
 print(f"Mean: {np.array(angles).mean()}")
 print(f"Std: {np.array(angles).std()}")
+print()
 
 # histogram of angles
 plt.title("Histogram of water molecule angle H3-O0-H2")
@@ -218,6 +231,17 @@ dihedral_angles = dih.results.angles
 
 # histogram of angles
 plt.title("Dihedral angle of H4-O1-O0-H2")
+plt.xlabel("Angle [degrees]")
+plt.ylabel("Density")
+sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
+#plt.axvline(np.array(dihedral_angles).mean(), color='r', linestyle='dashed', label="r0")
+plt.show()
+
+dih = dihedrals.Dihedral([pto.atoms[[4,1,0,6]]]).run()
+dihedral_angles = dih.results.angles
+
+# histogram of angles
+plt.title("Dihedral angle of H4-O1-O0-H6")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
 sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
