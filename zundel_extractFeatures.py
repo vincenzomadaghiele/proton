@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
     # get trajectory array
     trajectory_positions = returnPositions(pto)
-    q_array = charges.mean(axis=0)
+    q_mean = charges.mean(axis=0)
 
     
     #%% Extract features
@@ -172,8 +172,23 @@ if __name__ == '__main__':
     
     #%% Calculate potential
 
+    # extract structure data from trajectory
     FRAME = 0
     p, r_matrix, theta_3Dmatrix, phi_4Dmatrix = extractFeaturesFromStructure(pto, FRAME)
+    q = charges[FRAME]
     
+    # Bond stretching potential
+    V_frame_bond = kdist_matrix * (r_matrix - r0_matrix)**2 
+    V_frame_bond = np.sum(np.triu(V_frame_bond))
+
+    # Angle potential
+    #V_frame_angle = ktheta_3Dmatrix * (theta_3Dmatrix - theta0_3Dmatrix)**2 
+    #V_frame_angle = np.sum(np.triu(V_frame_angle))    
+
+    # Coulomb potential
+    diag = np.diag(np.diag(np.ones(r_matrix.shape)))
+    q_prod_charges = np.triu((q.reshape(-1, 1).T * q.reshape(-1, 1) ) / (r_matrix + diag))
+    q_prod_charges = q_prod_charges - np.diag(np.diag(q_prod_charges))
+    V_frame_charges = np.sum(q_prod_charges) / (4 * np.pi)
     
     

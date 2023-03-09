@@ -259,15 +259,16 @@ for ts in pto.trajectory:
 impropers00 = np.array(impropers)
 
 print("Improper dihedral for O0")
-print(f"Mean: {np.array(impropers).mean()}")
-print(f"Std: {np.array(impropers).std()}")
+print(f"Mean: {np.abs(np.array(impropers)).mean()}")
+print(f"Std: {np.abs(np.array(impropers)).std()}")
 print()
 
 # histogram of angles
 plt.title("Histogram of improper dihedrals O0")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=impropers00, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=np.abs(impropers00), kde=True, fill=False, alpha=0.5)
+plt.axvline(np.array(np.abs(impropers00)).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
 
@@ -280,17 +281,17 @@ for ts in pto.trajectory:
 impropers01 = np.array(impropers)
 
 print("Improper dihedral for O1")
-print(f"Mean: {np.array(impropers).mean()}")
-print(f"Std: {np.array(impropers).std()}")
+print(f"Mean: {np.abs(np.array(impropers)).mean()}")
+print(f"Std: {np.abs(np.array(impropers)).std()}")
 print()
 
 # histogram of angles
 plt.title("Histogram of improper dihedrals O1")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=impropers01, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=np.abs(impropers01), kde=True, fill=False, alpha=0.5)
+plt.axvline(np.array(np.abs(impropers01)).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
-
 
 # distances over time
 plt.title("Improper dihedral angles")
@@ -302,3 +303,12 @@ plt.axhline(np.array(impropers00).mean(), color='r', linestyle='dashed', label="
 plt.legend()
 plt.show()
 
+# Potential curve
+sorted_impropers = np.sort(np.abs(impropers00))
+V = np.abs(np.array(impropers00)).std() * ((np.abs(sorted_impropers) - np.abs(impropers00).mean()) ** 2)
+plt.title("Improper dihedral potential")
+plt.xlabel("Dihedral angle [degrees]")
+plt.ylabel("Potential")
+plt.plot(sorted_impropers, V)
+plt.axvline(sorted_impropers[V.argmin()], color='r', linestyle='dashed', label="r0")
+plt.show()
