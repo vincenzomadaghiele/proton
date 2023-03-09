@@ -180,7 +180,6 @@ sns.histplot(data=angles, kde=True, fill=False, alpha=0.5)
 plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
-
 # HYDROGEN OXIGEN MIDDLE PROTON
 
 #% H3-O1-H4 proton angle
@@ -248,4 +247,58 @@ sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
 #plt.axvline(np.array(dihedral_angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
+
+#%% impropers dihedrals
+
+impropers = []
+for ts in pto.trajectory:
+    # calculate angle
+    improper = atoms[[3,2,6,0]].improper.value() # group three atoms
+    impropers.append(improper) # get angle value
+
+impropers00 = np.array(impropers)
+
+print("Improper dihedral for O0")
+print(f"Mean: {np.array(impropers).mean()}")
+print(f"Std: {np.array(impropers).std()}")
+print()
+
+# histogram of angles
+plt.title("Histogram of improper dihedrals O0")
+plt.xlabel("Angle [degrees]")
+plt.ylabel("Density")
+sns.histplot(data=impropers, kde=True, fill=False, alpha=0.5)
+plt.show()
+
+
+impropers = []
+for ts in pto.trajectory:
+    # calculate angle
+    improper = atoms[[3,4,5,1]].improper.value() # group three atoms
+    impropers.append(improper) # get angle value
+
+impropers01 = np.array(impropers)
+
+print("Improper dihedral for O1")
+print(f"Mean: {np.array(impropers).mean()}")
+print(f"Std: {np.array(impropers).std()}")
+print()
+
+# histogram of angles
+plt.title("Histogram of improper dihedrals O1")
+plt.xlabel("Angle [degrees]")
+plt.ylabel("Density")
+sns.histplot(data=impropers, kde=True, fill=False, alpha=0.5)
+plt.show()
+
+
+# distances over time
+plt.title("Improper dihedral angles")
+plt.xlabel("Trajectory time [fs]")
+plt.ylabel("angle [degrees]")
+plt.plot(impropers00[300:450], label="O0")
+plt.plot(impropers01[300:450], label="O1")
+plt.axhline(np.array(oh1_dist).mean(), color='r', linestyle='dashed', label="r0")
+plt.legend()
+plt.show()
 

@@ -1,0 +1,93 @@
+* additional parameters for heme
+*
+
+!ATOMS
+< add atom types as: MASS -1 <unique atom type name> <mass in Dalton>
+!MASS  -1  CPA       12.01100 ! heme alpha-C
+!MASS  -1  CPB       12.01100 ! heme beta-C
+!MASS  -1  CPM       12.01100 ! heme meso-C
+!MASS  -1  CM        12.01100 ! heme CO carbon
+!MASS  -1  CST       12.01100 ! CO2 carbon 
+!MASS  -1  NPH       14.00700 ! heme pyrrole N
+!MASS  -1  OM        15.99900 ! heme CO/O2 oxygen
+!MASS  -1  OST       15.99900 ! CO2 oxygen
+!MASS  -1  FE        55.84700 ! heme iron 56
+
+BONDS
+!
+!V(bond) = Kb(b - b0)**2
+!
+!Kb: kcal/mole/A**2
+!b0: A
+!
+!atom type Kb          b0
+!
+C    C     600.000     1.3350 ! ALLOW ARO HEM???
+                ! Heme vinyl substituent (KK, from propene (JCS))
+
+<place bond parameters here>
+
+ANGLES
+!
+!V(angle) = Ktheta(Theta - Theta0)**2
+!
+!V(Urey-Bradley) = Kub(S - S0)**2
+!
+!Ktheta: kcal/mole/rad**2
+!Theta0: degrees
+!Kub: kcal/mole/A**2 (Urey-Bradley)
+!S0: A
+!
+!atom types     Ktheta    Theta0   Kub     S0
+!
+!HA   C    C      50.000   120.5000 ! ALLOW   PEP POL ARO???
+                ! Heme vinyl substituent (KK from propene (JCS))
+<place angle parameters here>
+
+DIHEDRALS
+!
+!V(dihedral) = Kchi(1 + cos(n(chi) - delta))
+!
+!Kchi: kcal/mole
+!n: multiplicity
+!delta: degrees
+!
+!atom types             Kchi    n   delta
+!
+!HA   C    C    HA     20.0000         0      0.0000 ! ALLOW   PEP POL ARO???
+                ! Heme vinyl substituent (KK, from propene (JCS))
+<place dihedral angle parameters here>
+
+IMPROPER
+!
+!V(improper) = Kpsi(psi - psi0)**2
+!
+!Kpsi: kcal/mole/rad**2
+!psi0: degrees
+!note that the second column of numbers (0) is ignored
+!
+!atom types           Kpsi                   psi0
+!
+CPB  CPA  NPH  CPA    20.8000         0      0.0000 ! ALLOW HEM
+                ! Heme (6-liganded): porphyrin macrocycle (KK 05/13/91)
+<place improper angle parameters here>
+
+NONBONDED nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
+cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.0 wmin 1.5
+                !adm jr., 5/08/91, suggested cutoff scheme
+!
+!V(Lennard-Jones) = Eps,i,j[(Rmin,i,j/ri,j)**12 - 2(Rmin,i,j/ri,j)**6]
+!
+!epsilon: kcal/mole, Eps,i,j = sqrt(eps,i * eps,j)
+!Rmin/2: A, Rmin,i,j = Rmin/2,i + Rmin/2,j
+!
+!atom  ignored    epsilon      Rmin/2   ignored   eps,1-4       Rmin/2,1-4
+!
+CPA    0.000000  -0.090000     1.800000 ! ALLOW HEM
+                ! Heme (6-liganded): porphyrin macrocycle (KK 05/13/91)
+
+< you might not need those for now >
+
+end
+
+return
