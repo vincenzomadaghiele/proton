@@ -68,10 +68,3 @@ plt.title('Histogram of O1 charge versus distance from middle H')
 sns.histplot(data=df, x='O1 charge', y='distance (O1-H) - (O2-H)')
 plt.show()
 
-#%% histogram of difference
-plt.title("Histogram of O0 charge")
-plt.xlabel("Charge")
-plt.ylabel("Density")
-sns.histplot(data=O0_charge, label="middle H charge", kde=True)
-plt.axvline(np.array(O0_charge).mean(), color='r', linestyle='dashed', label="r0")
-plt.show()

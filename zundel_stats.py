@@ -248,7 +248,7 @@ sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
 plt.show()
 
 
-#%% impropers dihedrals
+#%% Impropers dihedrals
 
 impropers = []
 for ts in pto.trajectory:
@@ -267,7 +267,7 @@ print()
 plt.title("Histogram of improper dihedrals O0")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=impropers, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=impropers00, kde=True, fill=False, alpha=0.5)
 plt.show()
 
 
@@ -288,7 +288,7 @@ print()
 plt.title("Histogram of improper dihedrals O1")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=impropers, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=impropers01, kde=True, fill=False, alpha=0.5)
 plt.show()
 
 
@@ -298,7 +298,7 @@ plt.xlabel("Trajectory time [fs]")
 plt.ylabel("angle [degrees]")
 plt.plot(impropers00[300:450], label="O0")
 plt.plot(impropers01[300:450], label="O1")
-plt.axhline(np.array(oh1_dist).mean(), color='r', linestyle='dashed', label="r0")
+plt.axhline(np.array(impropers00).mean(), color='r', linestyle='dashed', label="r0")
 plt.legend()
 plt.show()
 

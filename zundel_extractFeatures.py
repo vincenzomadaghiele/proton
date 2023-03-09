@@ -1,9 +1,15 @@
 import os
-import MDAnalysis as mda
-from MDAnalysis.analysis import rms, dihedrals
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import MDAnalysis as mda
+from MDAnalysis.analysis import rms, dihedrals
+
+
+class PotentialModel:
+    def __init__(self, MDAuniverse):
+        self.universe = MDAuniverse
+
 
 def returnPositions(MDAuniverse):
     # iterate over trajectory timesteps
@@ -73,13 +79,66 @@ def calculateAngles(MDAuniverse):
     ktheta_3Dmatrix = np.array(ktheta_3Dmatrix)
     return theta0_3Dmatrix, ktheta_3Dmatrix
 
+def extractFeaturesFromStructure(MDAuniverse, FRAME):
+    i = 0
+    # select correct frame
+    for ts in MDAuniverse.trajectory:
+        if i == FRAME:
+            # extract positions 
+            p = MDAuniverse.atoms.positions
+            
+            # extract distances
+            r_matrix = []
+            for atom1 in range(MDAuniverse.atoms.names.shape[0]):
+                r_line = []
+                for atom2 in range(MDAuniverse.atoms.names.shape[0]):
+                    r_ij = rms.rmsd(MDAuniverse.atoms[[atom1]].positions, MDAuniverse.atoms[[atom2]].positions)
+                    r_line.append(r_ij)
+                r_matrix.append(r_line)
+            r_matrix = np.array(r_matrix)
+
+            # extract angles
+            theta_3Dmatrix = []
+            for atom1 in range(MDAuniverse.atoms.names.shape[0]):
+                theta_matrix = []
+                for atom2 in range(MDAuniverse.atoms.names.shape[0]):
+                    theta_line = []
+                    for atom3 in range(MDAuniverse.atoms.names.shape[0]):
+                        theta = MDAuniverse.atoms[[atom1,atom2,atom3]].angle.value() 
+                        theta_line.append(theta)
+                    theta_matrix.append(theta_line)
+                theta_3Dmatrix.append(theta_matrix)
+            theta_3Dmatrix = np.array(theta_3Dmatrix)
+
+            # extract dihedrals
+            phi_4Dmatrix = []
+            for atom1 in range(MDAuniverse.atoms.names.shape[0]):
+                phi_3Dmatrix = []
+                for atom2 in range(MDAuniverse.atoms.names.shape[0]):
+                    phi_matrix = []
+                    for atom3 in range(MDAuniverse.atoms.names.shape[0]):
+                        phi_line = []
+                        for atom4 in range(MDAuniverse.atoms.names.shape[0]):
+                            phi = MDAuniverse.atoms[[atom1,atom2,atom3,atom4]].dihedral.value() 
+                            phi_line.append(phi)
+                        phi_matrix.append(phi_line)
+                    phi_3Dmatrix.append(phi_matrix)
+                phi_4Dmatrix.append(phi_3Dmatrix)
+            phi_4Dmatrix = np.array(phi_4Dmatrix)
+            break
+        i += 1
+    return p, r_matrix, theta_3Dmatrix, phi_4Dmatrix
+
+
 if __name__ == '__main__':
 
     # load tranjectory
-    xyz_path = "data/zundel_trajectory.xyz"
-    out_path = "data/zundel_log.out"
+    xyz_path = "data/zundel_trajectory_150ps.xyz"
+    out_path = "data/zundel_log_150ps.out"
+    charges_path = 'data/zundel_resp_charges.npy'
     pto = mda.Universe(xyz_path)
-    
+    charges = np.load(charges_path)
+
     # print info
     print("Loaded " + str(pto))
     print("Trajectory length: " + str(len(pto.trajectory))) 
@@ -97,10 +156,11 @@ if __name__ == '__main__':
     
     # convert from ps to fs by averaging
     energies = np.array(energies)
-    energies = np.mean(energies[:-1].reshape(-1, 10), axis=1)
+    energies = np.mean(energies.reshape(-1, 10), axis=1)
 
     # get trajectory array
     trajectory_positions = returnPositions(pto)
+    q_array = charges.mean(axis=0)
 
     
     #%% Extract features
@@ -108,4 +168,12 @@ if __name__ == '__main__':
     # get distances and angles
     r0_matrix, kdist_matrix = calculateDistances(pto)
     theta0_3Dmatrix, ktheta_3Dmatrix = calculateAngles(pto)
+
+    
+    #%% Calculate potential
+
+    FRAME = 0
+    p, r_matrix, theta_3Dmatrix, phi_4Dmatrix = extractFeaturesFromStructure(pto, FRAME)
+    
+    
     
