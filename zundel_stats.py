@@ -69,7 +69,18 @@ plt.axvline(np.array(oh2_dist).mean(), color='r', linestyle='dashed', label="r0"
 plt.legend()
 plt.show()
 
-# histogram of difference
+# Potential curve
+sorted_dists = np.sort(np.abs(np.array(oh2_dist)))
+V = np.abs(np.array(sorted_dists)).std() * ((np.abs(np.array(sorted_dists)) - np.abs(np.array(sorted_dists)).mean()) ** 2)
+plt.title("Potential of distance from middle H")
+plt.xlabel("distance [A]")
+plt.ylabel("Potential")
+plt.plot(sorted_dists, V)
+plt.axvline(sorted_dists[V.argmin()], color='r', linestyle='dashed', label="r0")
+plt.show()
+
+
+#%% histogram of difference
 plt.title("Histogram of (O1-H) - (O2-H)")
 plt.xlabel("distance [A]")
 plt.ylabel("Density")
@@ -137,8 +148,18 @@ sns.histplot(data=angles, kde=True, fill=False, alpha=0.5)
 plt.axvline(np.array(angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
+# Potential curve
+sorted_angles = np.sort(np.abs(np.array(angles)))
+V = np.abs(np.array(sorted_angles)).std() * ((np.abs(np.array(sorted_angles)) - np.abs(np.array(sorted_angles)).mean()) ** 2)
+plt.title("Angle potential")
+plt.xlabel("Angle [degrees]")
+plt.ylabel("Potential")
+plt.plot(sorted_angles, V)
+plt.axvline(sorted_angles[V.argmin()], color='r', linestyle='dashed', label="r0")
+plt.show()
 
-# WATER MOLECULES
+
+#%% WATER MOLECULES
 
 # H4-O1-H5 proton angle
 angles = []
@@ -236,6 +257,26 @@ sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
 #plt.axvline(np.array(dihedral_angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
+from scipy import optimize
+
+def test_func(x, a1, b1, c1, a2, b2, c2, d):
+    return a1 * np.cos(b1 * x + c1) + a2 * np.cos(b2 * x + c2) + d
+
+x_data = np.linspace(1, dihedral_angles.shape[0], dihedral_angles.shape[0])
+y_data = np.array(dihedral_angles).reshape(-1)
+params, params_covariance = optimize.curve_fit(test_func, x_data, y_data)
+
+plt.figure(figsize=(6, 4))
+plt.scatter(x_data[300:600], y_data[300:600], label='Data')
+plt.plot(x_data[300:600], test_func(x_data[300:600], params[0], params[1], params[2], params[3], params[4], params[5], params[6]), label='Fitted function')
+plt.legend(loc='best')
+plt.show()
+
+#plt.plot(dihedral_angles[300:600])
+#plt.show()
+
+
+#%%
 dih = dihedrals.Dihedral([pto.atoms[[4,1,0,6]]]).run()
 dihedral_angles = dih.results.angles
 

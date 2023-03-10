@@ -125,7 +125,6 @@ def extractFeaturesFromStructure(MDAuniverse, FRAME):
                     phi_3Dmatrix.append(phi_matrix)
                 phi_4Dmatrix.append(phi_3Dmatrix)
             phi_4Dmatrix = np.array(phi_4Dmatrix)
-            break
         i += 1
     return p, r_matrix, theta_3Dmatrix, phi_4Dmatrix
 
