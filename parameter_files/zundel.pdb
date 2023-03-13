@@ -1,0 +1,9 @@
+REMARK original generated coordinate pdb file
+ATOM      1  O1  ZUN X   1       0.572  -0.821  -0.341  1.00  0.00      ZUND O
+ATOM      2  O2  ZUN X   1       2.931  -1.001   0.035  1.00  0.00      ZUND O
+ATOM      3  H11 ZUN X   1       0.116  -1.329  -1.030  1.00  0.00      ZUND H
+ATOM      4  HC  ZUN X   1       1.751  -0.911  -0.153  1.00  0.00      ZUND H
+ATOM      5  H12 ZUN X   1       0.006  -0.231   0.182  1.00  0.00      ZUND H
+ATOM      6  H21 ZUN X   1       3.305  -1.551   0.741  1.00  0.00      ZUND H
+ATOM      7  H22 ZUN X   1       3.581  -0.533  -0.513  1.00  0.00      ZUND H
+END

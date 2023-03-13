@@ -1,0 +1,27 @@
+* Zundel ion topology by mpoeverlein
+*
+36  1
+
+MASS -1 OZ  15.999400 O ! Zundel oxygen
+MASS -1 HZC  1.008000 H ! Zundel center proton
+MASS -1 HZO  1.008000 H ! Zundel off-center proton
+
+
+RESI ZUN         1.00  ! Zundel ion
+GROUP
+ATOM O1   OZ    -0.785 !   H11   H12
+ATOM O2   OZ    -0.785 !     \  /
+ATOM H11  HZO    0.505 !      O1
+ATOM HC   HZC    0.550 !      | 
+ATOM H12  HZO    0.505 !      HC
+ATOM H21  HZO    0.505 !      | 
+ATOM H22  HZO    0.505 !      O2
+                      !     /  \
+                      !   H21  H22
+
+BOND  O1   H11    O1   H12   O1   HC
+BOND  O2   H21    O2   H22   O2   HC
+
+
+
+END

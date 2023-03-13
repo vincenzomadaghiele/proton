@@ -79,6 +79,25 @@ plt.plot(sorted_dists, V)
 plt.axvline(sorted_dists[V.argmin()], color='r', linestyle='dashed', label="r0")
 plt.show()
 
+#%%
+
+counts, bins = np.histogram(np.array(oh1_dist), bins=100, density=True)
+energies = - 0.616 * np.log(counts) # convert p(r) to energy E(i)
+
+
+import scipy.stats as stats
+
+mu = np.array(oh1_dist).mean()
+sigma = np.array(oh1_dist).std()
+
+plt.plot(bins[:-1], counts)
+plt.plot(bins[:-1], stats.norm.pdf(bins[:-1], mu, sigma))
+plt.show()  
+
+plt.plot(bins[:-1], energies)
+plt.plot(bins[:-1], (0.616 / (2 * (sigma**2))) * ((bins[:-1] - mu)**2))
+plt.show()
+
 
 #%% histogram of difference
 plt.title("Histogram of (O1-H) - (O2-H)")

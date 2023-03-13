@@ -13,9 +13,10 @@ def calculateDistance(MDAuniverse, atom_index1, atom_index2,
         dist = rms.rmsd(MDAuniverse.atoms[[atom_index1]].positions, MDAuniverse.atoms[[atom_index2]].positions)
         distances.append(dist)
     distances = np.array(distances)
-    r0 = distances.mean()
-    k = distances.std()
-    
+    r0 = distances.mean() # in A
+    k = distances.std() 
+    k = 0.616 / (2 * (k**2)) # kcal/mole/A**2
+
     if printExample:
         # distances over time
         plt.title(f"Bond Distance {atom_names}")
@@ -56,8 +57,9 @@ def calculateAngle(MDAuniverse, atom1, atom2, atom3,
         angle = MDAuniverse.atoms[[atom1,atom2,atom3]].angle.value() # group three atoms
         angles.append(angle) # get angle value
     angles = np.array(angles) * (np.pi/180) # convert to radians
-    theta0 = angles.mean()
-    k = angles.std()
+    theta0 = angles.mean() * (180 / np.pi) # degrees
+    k = angles.std() 
+    k = 0.616 / (2 * (k**2)) # kcal/mole/rad**2
     
     if printExample:
         # distances over time
@@ -100,9 +102,14 @@ def calculateImproper(MDAuniverse, atom1, atom2, atom3, atom4,
         improper = atoms[[atom1, atom2, atom3, atom4]].improper.value() # group three atoms
         impropers.append(improper) # get angle value
     impropers = np.abs(np.array(impropers)) * (np.pi/180)
-    xi0 = impropers.mean()
+    xi0 = impropers.mean() * (180 / np.pi) # degrees
     k_xi = impropers.std()
-    
+    k_xi = 0.616 / (2 * (k_xi**2)) # kcal/mole/rad**2
+
+    #V(improper) = Kpsi(psi - psi0)**2
+    # Kpsi: kcal/mole/rad**2
+    # psi0: degrees
+
     if printExample:
         # distances over time
         plt.title(f"Improper dihedral {atom_names}")
@@ -169,12 +176,14 @@ def calculateDihedral(MDAuniverse, atom1, atom2, atom3, atom4,
     N = counts.shape[0] # number of data points
     t = np.linspace(0, 2*np.pi, N)
     data = energies - np.min(energies)
-            
+    
     # fit cosine to energy 
     guess_phase = 1
     guess_amp = 1
     optimize_func = lambda x: x[0] * (1 + np.cos(2* t - x[1])) - data
     k_phi, phi0 = leastsq(optimize_func, [guess_amp, guess_phase])[0]
+    # k_phi --> kcal/mole
+    # phi0 --> degrees
     
     # recreate the fitted curve using the optimized parameters
     data_fit = k_phi * (1 + np.cos(2 * t + phi0))
@@ -193,8 +202,8 @@ def calculateDihedral(MDAuniverse, atom1, atom2, atom3, atom4,
         plt.legend()
         plt.show()
 
+    phi0 = phi0 * (180 / np.pi) # degrees
     return k_phi, phi0, dihedrals
-
 
 
 if __name__ == '__main__':
