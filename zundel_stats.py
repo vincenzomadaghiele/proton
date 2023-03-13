@@ -246,24 +246,71 @@ plt.show()
 
 #%% Dihedral analysis
 
+from sklearn import preprocessing
+from scipy import optimize
+
 dih = dihedrals.Dihedral([pto.atoms[[4,1,0,2]]]).run()
 dihedral_angles = dih.results.angles
+# convert to radians
+dihedral_angles = dihedral_angles * (np.pi/180)
+# normalize
+scaler = preprocessing.MinMaxScaler()
+dihedral_normalized = scaler.fit_transform(dihedral_angles)
 
 # histogram of angles
 plt.title("Dihedral angle of H4-O1-O0-H2")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=dihedral_normalized, kde=True, fill=False, alpha=0.5)
 #plt.axvline(np.array(dihedral_angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
-from scipy import optimize
+
+counts, bins = np.histogram(dihedral_normalized, bins=50)
+plt.plot(bins[:-1], counts)
+plt.show()
+
+
+# Data curve
+plt.title("Dihedral angle of H4-O1-O0-H2")
+plt.xlabel("Timestep")
+plt.ylabel("Angle [degrees]")
+plt.plot(dihedral_normalized[300:600])
+plt.show()
+
+x_data_to_fit = np.linspace(0,dihedral_normalized.shape[0], dihedral_normalized.shape[0])
+y_data_to_fit = dihedral_normalized.reshape(-1)
+
+def test_func(x, a, b, c, d):
+    y = a*np.cos(b*x + c) + d
+    return y
+
+params, params_covariance = optimize.curve_fit(test_func, x_data_to_fit, y_data_to_fit)
+print(params)
+
+a = params[0]
+b = params[1]
+c = params[2]
+d = params[3]
+
+# Data curve
+plt.title("Dihedral angle of H4-O1-O0-H2")
+plt.xlabel("Timestep")
+plt.ylabel("Angle [degrees]")
+plt.plot(dihedral_normalized[300:600])
+plt.plot(test_func(x_data_to_fit[300:600], a , b, c, d))
+plt.show()
+
+
+
+#%%
+
 
 def test_func(x, a1, b1, c1, a2, b2, c2, d):
     return a1 * np.cos(b1 * x + c1) + a2 * np.cos(b2 * x + c2) + d
 
-x_data = np.linspace(1, dihedral_angles.shape[0], dihedral_angles.shape[0])
-y_data = np.array(dihedral_angles).reshape(-1)
+x_data = np.linspace(1, d.shape[0], d.shape[0])
+y_data = np.array(d).reshape(-1)
 params, params_covariance = optimize.curve_fit(test_func, x_data, y_data)
 
 plt.figure(figsize=(6, 4))

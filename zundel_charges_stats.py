@@ -12,6 +12,8 @@ pto = mda.Universe("data/zundel_trajectory_150ps.xyz")
 print("Loaded " + str(pto))
 print("Trajectory length: " + str(len(pto.trajectory))) 
 
+q_mean = charges.mean(axis=0)
+
 # array of distances from middle proton
 oh1_dist = []
 oh2_dist = []

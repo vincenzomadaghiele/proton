@@ -22,6 +22,15 @@ def returnPositions(MDAuniverse):
     trajectory_positions = np.asarray(trajectory_positions[:-1])
     return trajectory_positions
 
+def calculateDistance(MDAuniverse, atom_index1, atom_index2):
+    distances = []
+    for ts in MDAuniverse.trajectory:
+        dist = rms.rmsd(MDAuniverse.atoms[[atom_index1]].positions, MDAuniverse.atoms[[atom_index2]].positions)
+        distances.append(dist)
+    r0 = np.array(distances).mean()
+    k = np.array(distances).std()
+    return r0, k, np.array(distances)
+
 def calculateDistances(MDAuniverse):
     print()
     print("Calculating distances...")
@@ -47,6 +56,15 @@ def calculateDistances(MDAuniverse):
     r0_matrix = np.array(r0_matrix)
     kdist_matrix = np.array(kdist_matrix)
     return r0_matrix, kdist_matrix
+
+def calculateAngle(MDAuniverse, atom1, atom2, atom3):
+    angles = []
+    for ts in MDAuniverse.trajectory:                
+        angle = MDAuniverse.atoms[[atom1,atom2,atom3]].angle.value() # group three atoms
+        angles.append(angle) # get angle value
+    theta0 = np.array(angles).mean()
+    k = np.array(angles).std()
+    return theta0, k, np.array(angles)
 
 def calculateAngles(MDAuniverse):
     print()
