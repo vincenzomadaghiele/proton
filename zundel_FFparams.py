@@ -8,6 +8,11 @@ from scipy.optimize import leastsq
 
 def calculateDistance(MDAuniverse, atom_index1, atom_index2,
                       printExample=False, printHist=False, printPotential=False, atom_names=""):
+    
+    # V(bond) = Kb(b - b0)**2
+    # Kb: kcal/mole/A**2
+    # b0: A
+    
     distances = []
     for ts in MDAuniverse.trajectory:
         dist = rms.rmsd(MDAuniverse.atoms[[atom_index1]].positions, MDAuniverse.atoms[[atom_index2]].positions)
@@ -52,6 +57,11 @@ def calculateDistance(MDAuniverse, atom_index1, atom_index2,
 
 def calculateAngle(MDAuniverse, atom1, atom2, atom3,
                    printExample=False, printHist=False, printPotential=False, atom_names=""):
+    
+    # V(angle) = Ktheta(Theta - Theta0)**2
+    # Ktheta: kcal/mole/rad**2
+    # Theta0: degrees
+    
     angles = []
     for ts in MDAuniverse.trajectory:                
         angle = MDAuniverse.atoms[[atom1,atom2,atom3]].angle.value() # group three atoms
@@ -94,57 +104,13 @@ def calculateAngle(MDAuniverse, atom1, atom2, atom3,
 
     return theta0, k, angles
 
-def calculateImproper(MDAuniverse, atom1, atom2, atom3, atom4,
-                      printExample=False, printHist=False, printPotential=False, atom_names=""):
-    impropers = []
-    for ts in pto.trajectory:
-        # calculate angle
-        improper = atoms[[atom1, atom2, atom3, atom4]].improper.value() # group three atoms
-        impropers.append(improper) # get angle value
-    impropers = np.abs(np.array(impropers)) * (np.pi/180)
-    xi0 = impropers.mean() * (180 / np.pi) # degrees
-    k_xi = impropers.std()
-    k_xi = 0.616 / (2 * (k_xi**2)) # kcal/mole/rad**2
-
-    #V(improper) = Kpsi(psi - psi0)**2
-    # Kpsi: kcal/mole/rad**2
-    # psi0: degrees
-
-    if printExample:
-        # distances over time
-        plt.title(f"Improper dihedral {atom_names}")
-        plt.xlabel("Trajectory time [fs]")
-        plt.ylabel("Angle [rad]")
-        plt.plot(impropers[300:600], label="distance")
-        plt.axhline(xi0, color='r', linestyle='dashed', label="xi0")
-        plt.legend()
-        plt.show()
-    
-    if printHist:
-        # histogram of distances
-        plt.title(f"Histogram of improper dihedral {atom_names}")
-        plt.xlabel("Angle [rad]")
-        plt.ylabel("Density")
-        sns.kdeplot(data=impropers, label="distance")
-        plt.axvline(xi0, color='r', linestyle='dashed', label="xi0")
-        plt.legend()
-        plt.show()
-    
-    if printPotential:
-        # Potential curve
-        sorted_dists = np.sort(np.abs(impropers))
-        V = k_xi * ((np.abs(sorted_dists) - xi0) ** 2)
-        plt.title(f"Potential of improper dihedral {atom_names}")
-        plt.xlabel("Angle [rad]")
-        plt.ylabel("Potential")
-        plt.plot(sorted_dists, V)
-        plt.axvline(sorted_dists[V.argmin()], color='r', linestyle='dashed', label="xi0")
-        plt.show()
-
-    return xi0, k_xi, impropers
-
 def calculateDihedral(MDAuniverse, atom1, atom2, atom3, atom4,
                       printExample=False, printHist=False, printPotential=False, atom_names=""):
+    
+    # V(dihedral) = Kchi(1 + cos(n(chi) - delta))
+    # Kchi: kcal/mole
+    # n: multiplicity
+    # delta: degrees
     
     dihedrals = []
     for ts in pto.trajectory:
@@ -182,12 +148,9 @@ def calculateDihedral(MDAuniverse, atom1, atom2, atom3, atom4,
     guess_amp = 1
     optimize_func = lambda x: x[0] * (1 + np.cos(2* t - x[1])) - data
     k_phi, phi0 = leastsq(optimize_func, [guess_amp, guess_phase])[0]
-    # k_phi --> kcal/mole
-    # phi0 --> degrees
     
     # recreate the fitted curve using the optimized parameters
-    data_fit = k_phi * (1 + np.cos(2 * t + phi0))
-    
+    data_fit = k_phi * (1 + np.cos(2 * t + phi0))    
     # recreate the fitted curve using the optimized parameters
     fine_t = np.arange(0,max(t),0.1)
     data_fit = k_phi * (1 + np.cos(2 * fine_t + phi0))
@@ -204,6 +167,57 @@ def calculateDihedral(MDAuniverse, atom1, atom2, atom3, atom4,
 
     phi0 = phi0 * (180 / np.pi) # degrees
     return k_phi, phi0, dihedrals
+
+def calculateImproper(MDAuniverse, atom1, atom2, atom3, atom4,
+                      printExample=False, printHist=False, printPotential=False, atom_names=""):
+    
+    # V(improper) = Kpsi(psi - psi0)**2
+    # Kpsi: kcal/mole/rad**2
+    # psi0: degrees
+    
+    impropers = []
+    for ts in pto.trajectory:
+        # calculate angle
+        improper = atoms[[atom1, atom2, atom3, atom4]].improper.value() # group three atoms
+        impropers.append(improper) # get angle value
+    impropers = np.abs(np.array(impropers)) * (np.pi/180)
+    xi0 = impropers.mean() * (180 / np.pi) # degrees
+    k_xi = impropers.std()
+    k_xi = 0.616 / (2 * (k_xi**2)) # kcal/mole/rad**2
+
+    if printExample:
+        # distances over time
+        plt.title(f"Improper dihedral {atom_names}")
+        plt.xlabel("Trajectory time [fs]")
+        plt.ylabel("Angle [rad]")
+        plt.plot(impropers[300:600], label="distance")
+        plt.axhline(xi0, color='r', linestyle='dashed', label="xi0")
+        plt.legend()
+        plt.show()
+    
+    if printHist:
+        # histogram of distances
+        plt.title(f"Histogram of improper dihedral {atom_names}")
+        plt.xlabel("Angle [rad]")
+        plt.ylabel("Density")
+        sns.kdeplot(data=impropers, label="distance")
+        plt.axvline(xi0, color='r', linestyle='dashed', label="xi0")
+        plt.legend()
+        plt.show()
+    
+    if printPotential:
+        # Potential curve
+        sorted_dists = np.sort(np.abs(impropers))
+        V = k_xi * ((np.abs(sorted_dists) - xi0) ** 2)
+        plt.title(f"Potential of improper dihedral {atom_names}")
+        plt.xlabel("Angle [rad]")
+        plt.ylabel("Potential")
+        plt.plot(sorted_dists, V)
+        plt.axvline(sorted_dists[V.argmin()], color='r', linestyle='dashed', label="xi0")
+        plt.show()
+
+    return xi0, k_xi, impropers
+
 
 
 if __name__ == '__main__':
@@ -276,6 +290,27 @@ if __name__ == '__main__':
         print()
 
 
+    #%% Dihedral angles
+    
+    print()
+    print('Dihedral angle parameters')
+    print('-'*20)
+    
+    # specify list of improper dihedrals
+    dihedrals = [[2, 0, 1, 4], [2, 0, 1, 5]]
+    k_phis = []
+    phi0s = []
+    for dihedral in dihedrals:
+        atom_names = f'{atoms.names[dihedral[0]]}{dihedral[0]}-{atoms.names[dihedral[1]]}{dihedral[1]}-{atoms.names[dihedral[2]]}{dihedral[2]}-{atoms.names[dihedral[3]]}{dihedral[3]}'
+        k_phi, phi0, _ = calculateDihedral(pto, dihedral[0], dihedral[1], dihedral[2], dihedral[3])
+        k_phis.append(k_phi)
+        phi0s.append(phi0)
+        print(atom_names)
+        print(f'k_phi: {k_phi}')
+        print(f'phi0: {phi0}')
+        print()
+
+
     #%% Impropers
     
     print()
@@ -297,22 +332,3 @@ if __name__ == '__main__':
         print()
 
 
-    #%% Dihedral angles
-    
-    print()
-    print('Dihedral angle parameters')
-    print('-'*20)
-    
-    # specify list of improper dihedrals
-    dihedrals = [[2, 0, 1, 4], [2, 0, 1, 5]]
-    k_phis = []
-    phi0s = []
-    for dihedral in dihedrals:
-        atom_names = f'{atoms.names[dihedral[0]]}{dihedral[0]}-{atoms.names[dihedral[1]]}{dihedral[1]}-{atoms.names[dihedral[2]]}{dihedral[2]}-{atoms.names[dihedral[3]]}{dihedral[3]}'
-        k_phi, phi0, _ = calculateDihedral(pto, dihedral[0], dihedral[1], dihedral[2], dihedral[3], True, True, True, atom_names)
-        k_phis.append(k_phi)
-        phi0s.append(phi0)
-        print(atom_names)
-        print(f'k_phi: {k_phi}')
-        print(f'phi0: {phi0}')
-        print()

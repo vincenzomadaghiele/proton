@@ -1,0 +1,30 @@
+BONDS 
+!atom type Kb          b0
+OZ    HZO     517.542    0.977 
+OZ    HZC     32.181     1.218 
+
+ANGLES
+!atom types     Ktheta    Theta0   Kub     S0
+HZO   OZ    HZO      30.311   109.337 
+HZO   OZ    HZC      13.543   119.123 
+OZ   HZC    OZ      22.410   167.102 
+
+DIHEDRALS
+!atom types             Kchi    n   delta\
+HZO   OZ    OZ    HZO     0.223         2      5.895
+
+IMPROPER
+!atom types           Kpsi                   psi0
+HZO  HZO  HZC  OZ    8.488         0      20.011
+
+NONBONDED nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
+cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.0 wmin 1.5
+!atom  ignored    epsilon      Rmin/2   ignored   eps,1-4       Rmin/2,1-4
+HZO       0.0       -0.046     0.2245
+HZC       0.0       -0.046     0.2245
+OZ       0.0       -0.1521    1.7682
+
+end
+
+return
+ 
