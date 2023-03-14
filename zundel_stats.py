@@ -1,6 +1,6 @@
 '''
-This file contains analysis of single attributes such as distances, angles, dihedrals, charges.
-It shows examples of how to calculate those for the zelder species and how to plot them.
+This file contains analysis of single attributes such as distances, angles, dihedrals.
+It shows examples of how to calculate those for the Zundel species and how to plot them.
 '''
 
 import MDAnalysis as mda
@@ -8,6 +8,8 @@ from MDAnalysis.analysis import rms, dihedrals
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy.stats as stats
+
 
 # load tranjectory
 pto = mda.Universe("data/zundel_trajectory.xyz")
@@ -79,27 +81,31 @@ plt.plot(sorted_dists, V)
 plt.axvline(sorted_dists[V.argmin()], color='r', linestyle='dashed', label="r0")
 plt.show()
 
-#%%
+
+#%% Data VS model
 
 counts, bins = np.histogram(np.array(oh1_dist), bins=100, density=True)
 energies = - 0.616 * np.log(counts) # convert p(r) to energy E(i)
-
-
-import scipy.stats as stats
-
 mu = np.array(oh1_dist).mean()
 sigma = np.array(oh1_dist).std()
 
+plt.title("Histogram of of distance from middle H VS gaussian distribution")
+plt.xlabel("distance [A]")
+plt.ylabel("Probability density")
 plt.plot(bins[:-1], counts)
 plt.plot(bins[:-1], stats.norm.pdf(bins[:-1], mu, sigma))
 plt.show()  
 
+plt.title("Bond stretching energy")
+plt.xlabel("distance [A]")
+plt.ylabel("Energy [kcal/mol]")
 plt.plot(bins[:-1], energies)
 plt.plot(bins[:-1], (0.616 / (2 * (sigma**2))) * ((bins[:-1] - mu)**2))
 plt.show()
 
 
 #%% histogram of difference
+
 plt.title("Histogram of (O1-H) - (O2-H)")
 plt.xlabel("distance [A]")
 plt.ylabel("Density")
@@ -265,84 +271,19 @@ plt.show()
 
 #%% Dihedral analysis
 
-from sklearn import preprocessing
-from scipy import optimize
-
 dih = dihedrals.Dihedral([pto.atoms[[4,1,0,2]]]).run()
 dihedral_angles = dih.results.angles
 # convert to radians
 dihedral_angles = dihedral_angles * (np.pi/180)
-# normalize
-scaler = preprocessing.MinMaxScaler()
-dihedral_normalized = scaler.fit_transform(dihedral_angles)
 
 # histogram of angles
 plt.title("Dihedral angle of H4-O1-O0-H2")
 plt.xlabel("Angle [degrees]")
 plt.ylabel("Density")
-sns.histplot(data=dihedral_normalized, kde=True, fill=False, alpha=0.5)
+sns.histplot(data=dihedral_angles, kde=True, fill=False, alpha=0.5)
 #plt.axvline(np.array(dihedral_angles).mean(), color='r', linestyle='dashed', label="r0")
 plt.show()
 
-
-counts, bins = np.histogram(dihedral_normalized, bins=50)
-plt.plot(bins[:-1], counts)
-plt.show()
-
-
-# Data curve
-plt.title("Dihedral angle of H4-O1-O0-H2")
-plt.xlabel("Timestep")
-plt.ylabel("Angle [degrees]")
-plt.plot(dihedral_normalized[300:600])
-plt.show()
-
-x_data_to_fit = np.linspace(0,dihedral_normalized.shape[0], dihedral_normalized.shape[0])
-y_data_to_fit = dihedral_normalized.reshape(-1)
-
-def test_func(x, a, b, c, d):
-    y = a*np.cos(b*x + c) + d
-    return y
-
-params, params_covariance = optimize.curve_fit(test_func, x_data_to_fit, y_data_to_fit)
-print(params)
-
-a = params[0]
-b = params[1]
-c = params[2]
-d = params[3]
-
-# Data curve
-plt.title("Dihedral angle of H4-O1-O0-H2")
-plt.xlabel("Timestep")
-plt.ylabel("Angle [degrees]")
-plt.plot(dihedral_normalized[300:600])
-plt.plot(test_func(x_data_to_fit[300:600], a , b, c, d))
-plt.show()
-
-
-
-#%%
-
-
-def test_func(x, a1, b1, c1, a2, b2, c2, d):
-    return a1 * np.cos(b1 * x + c1) + a2 * np.cos(b2 * x + c2) + d
-
-x_data = np.linspace(1, d.shape[0], d.shape[0])
-y_data = np.array(d).reshape(-1)
-params, params_covariance = optimize.curve_fit(test_func, x_data, y_data)
-
-plt.figure(figsize=(6, 4))
-plt.scatter(x_data[300:600], y_data[300:600], label='Data')
-plt.plot(x_data[300:600], test_func(x_data[300:600], params[0], params[1], params[2], params[3], params[4], params[5], params[6]), label='Fitted function')
-plt.legend(loc='best')
-plt.show()
-
-#plt.plot(dihedral_angles[300:600])
-#plt.show()
-
-
-#%%
 dih = dihedrals.Dihedral([pto.atoms[[4,1,0,6]]]).run()
 dihedral_angles = dih.results.angles
 

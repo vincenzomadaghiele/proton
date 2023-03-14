@@ -1,3 +1,7 @@
+'''
+This file contains code to bulk-extract Force Field parameters for all atoms combination in the Zundel species.
+'''
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt

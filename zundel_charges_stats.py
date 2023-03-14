@@ -1,5 +1,10 @@
+'''
+This file contains analysis of charges.
+It shows examples of how to calculate those for the Zundel species and how to plot them.
+'''
+
 import MDAnalysis as mda
-from MDAnalysis.analysis import rms, dihedrals
+from MDAnalysis.analysis import rms
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
